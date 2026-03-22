@@ -9,7 +9,12 @@ import 'screens/spin_screen.dart';
 import 'utils/haptics.dart';
 import 'utils/sound_manager.dart';
 
-void main() {
+import 'services/session_service.dart';
+import 'providers/tab_provider.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await sessionService.initSession();
   runApp(
     const ProviderScope(
       child: SpinItApp(),
@@ -56,15 +61,8 @@ class SpinItApp extends StatelessWidget {
   }
 }
 
-class MainLayout extends StatefulWidget {
+class MainLayout extends ConsumerWidget {
   const MainLayout({super.key});
-
-  @override
-  State<MainLayout> createState() => _MainLayoutState();
-}
-
-class _MainLayoutState extends State<MainLayout> {
-  int _currentIndex = 0;
 
   final List<Widget> _pages = const [
     SpinScreen(),
@@ -73,10 +71,12 @@ class _MainLayoutState extends State<MainLayout> {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = ref.watch(tabProvider);
+
     return Scaffold(
       body: IndexedStack(
-        index: _currentIndex,
+        index: currentIndex,
         children: _pages,
       ),
       bottomNavigationBar: Container(
@@ -85,7 +85,7 @@ class _MainLayoutState extends State<MainLayout> {
         ),
         child: BottomNavigationBar(
           backgroundColor: const Color(0xFF1A1A2E),
-          currentIndex: _currentIndex,
+          currentIndex: currentIndex,
           selectedItemColor: const Color(0xFFFF6B6B),
           unselectedItemColor: const Color(0xFF555555),
           showSelectedLabels: false,
@@ -94,9 +94,7 @@ class _MainLayoutState extends State<MainLayout> {
           onTap: (index) {
             soundManager.playButtonTap();
             Haptics.selection();
-            setState(() {
-              _currentIndex = index;
-            });
+            ref.read(tabProvider.notifier).state = index;
           },
           items: const [
             BottomNavigationBarItem(

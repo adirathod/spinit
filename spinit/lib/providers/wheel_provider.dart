@@ -20,13 +20,15 @@ final List<WheelSegment> _kDefaultSegments = [
 class WheelState {
   final String name;
   final List<WheelSegment> segments;
+  final String? shareCode;
 
-  const WheelState({required this.name, required this.segments});
+  const WheelState({required this.name, required this.segments, this.shareCode});
 
-  WheelState copyWith({String? name, List<WheelSegment>? segments}) {
+  WheelState copyWith({String? name, List<WheelSegment>? segments, String? shareCode, bool clearShareCode = false}) {
     return WheelState(
       name: name ?? this.name,
       segments: segments ?? this.segments,
+      shareCode: clearShareCode ? null : (shareCode ?? this.shareCode),
     );
   }
 }
@@ -68,12 +70,17 @@ class WheelNotifier extends StateNotifier<WheelState> {
   }
 
   void loadPreset(String name, List<WheelSegment> segments) {
-    state = WheelState(name: name, segments: segments);
+    state = WheelState(name: name, segments: segments, shareCode: null);
+    saveSegments();
+  }
+
+  void loadSharedWheel(String name, List<WheelSegment> segments, String shareCode) {
+    state = WheelState(name: name, segments: segments, shareCode: shareCode);
     saveSegments();
   }
 
   void updateName(String name) {
-    state = state.copyWith(name: name);
+    state = state.copyWith(name: name, clearShareCode: true);
   }
 
   void addSegment() {
@@ -81,26 +88,26 @@ class WheelNotifier extends StateNotifier<WheelState> {
     final index = state.segments.length;
     final color = paletteColor(index);
     final list = [...state.segments, WheelSegment(label: 'Option ${index + 1}', color: color)];
-    state = state.copyWith(segments: list);
+    state = state.copyWith(segments: list, clearShareCode: true);
   }
 
   void removeSegment(int index) {
     if (state.segments.length <= 2) return;
     final list = [...state.segments];
     list.removeAt(index);
-    state = state.copyWith(segments: list);
+    state = state.copyWith(segments: list, clearShareCode: true);
   }
 
   void updateLabel(int index, String label) {
     final list = [...state.segments];
     list[index] = list[index].copyWith(label: label);
-    state = state.copyWith(segments: list);
+    state = state.copyWith(segments: list, clearShareCode: true);
   }
 
   void updateColor(int index, Color color) {
     final list = [...state.segments];
     list[index] = list[index].copyWith(color: color);
-    state = state.copyWith(segments: list);
+    state = state.copyWith(segments: list, clearShareCode: true);
   }
 }
 

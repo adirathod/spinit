@@ -1,72 +1,65 @@
 # SpinIt 🎡
 
-A fun, local wheel spinner app built with Flutter — Phase 1.
+A fun, vibrant wheel spinner app with local customization and cloud sharing features.
 
-## Features
+## ✨ Features
 
-- 🎨 Beautiful animated spinning wheel with 12-color vibrant palette
-- 🎉 Confetti celebration on result
-- ✏️ Real-time wheel editor with live preview
-- 💾 Segments saved locally with SharedPreferences
-- 📱 Works on Android & iOS — no internet needed
+- **Phase 1**: Beautiful animated spinning wheel, real-time editor, and confetti celebrations.
+- **Phase 2**: Preset packs (What to Eat, Truth or Dare, etc.), spin history log, sound effects, and haptic feedback.
+- **Phase 3**: cloud sharing via 6-character short codes, anonymous user sessions, and spin analytics.
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Flutter SDK (stable) — [flutter.dev/docs/get-started/install](https://flutter.dev/docs/get-started/install)
-- Android Studio or Xcode (for device/emulator)
+- Flutter SDK (stable)
+- Go (Golang) 1.22+ (for backend)
+- Docker & Docker Compose (for backend & database)
 
-### Run the App
+### Backend Setup (Phase 3)
 
-```bash
-# Install dependencies
-flutter pub get
+1. Navigate to the `backend` directory:
+   ```bash
+   cd backend
+   ```
+2. Start the API and PostgreSQL database using Docker:
+   ```bash
+   docker-compose up -d
+   ```
+3. The API will be available at `http://localhost:8080/v1`.
 
-# Run on connected device or emulator
-flutter run
+### Mobile Setup (Flutter)
 
-# Or run on specific platform
-flutter run -d android
-flutter run -d ios
+1. Install dependencies:
+   ```bash
+   flutter pub get
+   ```
+2. Run on your target device:
+   ```bash
+   flutter run
+   ```
+   *Note: For Android Emulator, you may need to change the API base URL in `lib/services/api_service.dart` from `localhost` to `10.0.2.2`.*
+
+## 📂 Project Structure (Phase 3)
+
+```
+├── backend/                  # Golang Fiber Backend
+│   ├── handlers/             # API request controllers
+│   ├── services/             # Business logic & background jobs
+│   ├── models/               # GORM database entities
+│   └── migrations/           # SQL schema
+├── lib/                      # Flutter Mobile App
+│   ├── services/             # API & Session management
+│   ├── providers/            # Riverpod state management
+│   ├── screens/              # App screens (Spin, Presets, History, Editor)
+│   └── widgets/              # Reusable UI components
 ```
 
-### Build APK (Android)
+## 🛠 Tech Stack
 
-```bash
-flutter build apk --debug
-```
-
-## Project Structure
-
-```
-lib/
-├── main.dart                  # App entry point, theme, routes
-├── models/
-│   └── wheel_segment.dart     # WheelSegment { label, color }
-├── providers/
-│   └── wheel_provider.dart    # Riverpod state + SharedPreferences
-├── screens/
-│   ├── spin_screen.dart       # Screen 1: Spin the wheel
-│   └── editor_screen.dart     # Screen 2: Customize segments
-├── utils/
-│   ├── colors.dart            # 12-color vibrant palette
-│   └── spin_calculator.dart   # Winning segment math
-└── widgets/
-    ├── wheel_painter.dart     # CustomPainter for the wheel
-    ├── spin_button.dart       # Glowing SPIN button
-    ├── result_sheet.dart      # Result modal + confetti
-    └── segment_tile.dart      # Editor list item
-```
-
-## Packages Used
-
-| Package | Purpose |
-|---------|---------|
-| `flutter_riverpod` | State management |
-| `shared_preferences` | Local segment storage |
-| `confetti` | Celebration animation |
-| `google_fonts` | Nunito + Righteous fonts |
+- **Frontend**: Flutter, Riverpod, Shared Preferences, AudioPlayers, Confetti.
+- **Backend**: Go (Fiber), GORM, PostgreSQL, JWT, Redis-style Rate Limiting.
+- **Infrastructure**: Docker, Docker Compose.
 
 ---
-Phase 1 — Wheel Spinner UI only. No backend, no auth, no networking.
+Built with ❤️ for rapid decision making.

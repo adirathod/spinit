@@ -10,7 +10,9 @@ import '../providers/sound_provider.dart';
 import '../providers/wheel_provider.dart';
 import '../utils/haptics.dart';
 import '../utils/sound_manager.dart';
+import '../services/api_service.dart';
 import '../utils/spin_calculator.dart';
+import '../widgets/share_bottom_sheet.dart';
 import '../widgets/result_sheet.dart';
 import '../widgets/spin_button.dart';
 import '../widgets/wheel_painter.dart';
@@ -111,6 +113,17 @@ class _SpinScreenState extends ConsumerState<SpinScreen>
     );
     ref.read(historyProvider.notifier).addEntry(entry);
 
+    // Log spin to backend if it's a shared wheel
+    if (wheelState.shareCode != null) {
+      apiService.logSpin(
+        wheelState.shareCode!,
+        winner.label,
+        '#${winner.color.r.toInt().toRadixString(16).padLeft(2, '0')}'
+            '${winner.color.g.toInt().toRadixString(16).padLeft(2, '0')}'
+            '${winner.color.b.toInt().toRadixString(16).padLeft(2, '0')}',
+      ).catchError((_) {}); // Silent fail for analytics
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -153,6 +166,21 @@ class _SpinScreenState extends ConsumerState<SpinScreen>
                         textAlign: TextAlign.center,
                       ),
                     ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.share_outlined, color: Colors.white70),
+                    onPressed: () {
+                      Haptics.selection();
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => ShareBottomSheet(
+                          wheelName: wheelState.name,
+                          segments: wheelState.segments,
+                        ),
+                      );
+                    },
                   ),
                   IconButton(
                     icon: Icon(isMuted ? Icons.volume_off : Icons.volume_up, color: Colors.white70),
